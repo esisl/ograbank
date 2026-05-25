@@ -1,105 +1,147 @@
-<h1>🚀 Разработка Системы Управления Банковскими Картами</h1>
+# Bank Cards REST API
 
-<h2>📁 Стартовая структура</h2>
-  <p>
-    Проектная структура с директориями и описательными файлами (<code>README Controller.md</code>, <code>README Service.md</code> и т.д.) уже подготовлена.<br />
-    Все реализации нужно добавлять <strong>в соответствующие директории</strong>.
-  </p>
-  <p>
-    После завершения разработки <strong>временные README-файлы нужно удалить</strong>, чтобы они не попадали в итоговую сборку.
-  </p>
-  
-<h2>📝 Описание задачи</h2>
-  <p>Разработать backend-приложение на Java (Spring Boot) для управления банковскими картами:</p>
-  <ul>
-    <li>Создание и управление картами</li>
-    <li>Просмотр карт</li>
-    <li>Переводы между своими картами</li>
-  </ul>
+RESTful-сервис для управления банковскими картами с аутентификацией через JWT.
 
-<h2>💳 Атрибуты карты</h2>
-  <ul>
-    <li>Номер карты (зашифрован, отображается маской: <code>**** **** **** 1234</code>)</li>
-    <li>Владелец</li>
-    <li>Срок действия</li>
-    <li>Статус: Активна, Заблокирована, Истек срок</li>
-    <li>Баланс</li>
-  </ul>
+## 🚀 Быстрый старт
 
-<h2>🧾 Требования</h2>
+### Требования
+- Java 17+
+- PostgreSQL 15+
+- Maven 3.8+
 
-<h3>✅ Аутентификация и авторизация</h3>
-  <ul>
-    <li>Spring Security + JWT</li>
-    <li>Роли: <code>ADMIN</code> и <code>USER</code></li>
-  </ul>
+### 1. Подготовка БД
+```sql
+CREATE DATABASE bank_db;
+CREATE USER bank_user WITH PASSWORD 'bank_pass';
+GRANT ALL PRIVILEGES ON DATABASE bank_db TO bank_user;
+\c bank_db
+GRANT ALL ON SCHEMA public TO bank_user;
+```
 
-<h3>✅ Возможности</h3>
-<strong>Администратор:</strong>
-  <ul>
-    <li>Создаёт, блокирует, активирует, удаляет карты</li>
-    <li>Управляет пользователями</li>
-    <li>Видит все карты</li>
-  </ul>
+### 2. Конфигурация
+Создайте `src/main/resources/application-dev.yaml`:
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank_db
+    username: bank_user
+    password: bank_pass
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    enabled: true
+    change-log: classpath:db/migration/changelog-master.xml
 
-<strong>Пользователь:</strong>
-  <ul>
-    <li>Просматривает свои карты (поиск + пагинация)</li>
-    <li>Запрашивает блокировку карты</li>
-    <li>Делает переводы между своими картами</li>
-    <li>Смотрит баланс</li>
-  </ul>
+jwt:
+  secret: "change-me-in-production-min-32-chars"
+  expiration: 3600000
+```
 
-<h3>✅ API</h3>
-  <ul>
-    <li>CRUD для карт</li>
-    <li>Переводы между своими картами</li>
-    <li>Фильтрация и постраничная выдача</li>
-    <li>Валидация и сообщения об ошибках</li>
-  </ul>
+### 3. Запуск
+```cmd
+mvn clean compile
+mvn spring-boot:run
+```
+Приложение доступно на `http://localhost:8080`.
 
-<h3>✅ Безопасность</h3>
-  <ul>
-    <li>Шифрование данных</li>
-    <li>Ролевой доступ</li>
-    <li>Маскирование номеров карт</li>
-  </ul>
+### 4. Тестирование
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI spec: `http://localhost:8080/v3/api-docs`
 
-<h3>✅ Работа с БД</h3>
-  <ul>
-    <li>PostgreSQL или MySQL</li>
-    <li>Миграции через Liquibase (<code>src/main/resources/db/migration</code>)</li>
-  </ul>
+## 🔐 Аутентификация
 
-<h3>✅ Документация</h3>
-  <ul>
-    <li>Swagger UI / OpenAPI — <code>docs/openapi.yaml</code></li>
-    <li><code>README.md</code> с инструкцией запуска</li>
-  </ul>
+1. Регистрация:
+```http
+POST /auth/register
+Content-Type: application/json
 
-<h3>✅ Развёртывание и тестирование</h3>
-  <ul>
-    <li>Docker Compose для dev-среды</li>
-    <li>Liquibase миграции</li>
-    <li>Юнит-тесты ключевой бизнес-логики</li>
-  </ul>
+{
+  "email": "user@example.com",
+  "password": "SecurePass123"
+}
+```
 
-<h2>📊 Оценка</h2>
-  <ul>
-    <li>Соответствие требованиям</li>
-    <li>Чистота архитектуры и кода</li>
-    <li>Безопасность</li>
-    <li>Обработка ошибок</li>
-    <li>Покрытие тестами</li>
-    <li>ООП и уровни абстракции</li>
-  </ul>
+2. Вход (получение токена):
+```http
+POST /auth/login
+Content-Type: application/json
 
-<h2>💡 Технологии</h2>
-  <p>
-    Java 17+, Spring Boot, Spring Security, Spring Data JPA, PostgreSQL/MySQL, Liquibase, Docker, JWT, Swagger (OpenAPI)
-  </p>
+{
+  "email": "user@example.com",
+  "password": "SecurePass123"
+}
+```
 
-<h2> 📤 Формат сдачи</h2>
-<p>
-Весь код и изменения принимаются только через git-репозиторий с открытым доступом к проекту. Отправка файлов в любом виде не принимается.
-  </p>
+3. Использование токена:
+```http
+GET /api/cards/user/{userId}
+Authorization: Bearer <your_jwt_token>
+```
+
+## 📦 Эндпоинты
+
+| Метод | Путь | Описание | Доступ |
+|-------|------|----------|--------|
+| `POST` | `/auth/register` | Регистрация пользователя | Публичный |
+| `POST` | `/auth/login` | Получение JWT | Публичный |
+| `GET` | `/auth/me` | Информация о текущем пользователе | Аутентифицированный |
+| `POST` | `/api/cards` | Создание карты | `USER`/`ADMIN` |
+| `GET` | `/api/cards/user/{id}` | Список карт пользователя | `USER`(свои)/`ADMIN`(все) |
+| `POST` | `/api/cards/transfer` | Перевод между своими картами | `USER`/`ADMIN` |
+
+### Параметры пагинации
+Для `GET /api/cards/user/{id}`:
+- `page` (default: 0) — номер страницы
+- `size` (default: 10, max: 100) — элементов на странице
+- `sortBy` (default: createdAt) — поле сортировки
+- `direction` (default: DESC) — `ASC` или `DESC`
+
+Пример: `?page=0&size=5&sortBy=balance&direction=ASC`
+
+## 🔧 Разработка
+
+### Структура проекта
+```
+src/
+├── main/
+│   ├── java/com/example/bankcards/
+│   │   ├── controller/  # REST-контроллеры
+│   │   ├── service/     # Бизнес-логика
+│   │   ├── repository/  # JPA-репозитории
+│   │   ├── entity/      # JPA-сущности
+│   │   ├── dto/         # Data Transfer Objects
+│   │   ├── security/    # JWT, UserDetails, SecurityConfig
+│   │   ├── util/        # JwtUtil
+│   │   └── exception/   # GlobalExceptionHandler
+│   └── resources/
+│       ├── db/migration/ # Liquibase-миграции
+│       └── application*.yaml
+```
+
+### Тестирование через PowerShell
+```powershell
+# Логин
+$token = (Invoke-RestMethod -Uri "http://localhost:8080/auth/login" -Method Post -ContentType "application/json" -Body (@{email="user@example.com";password="SecurePass123"}|ConvertTo-Json -Compress)).accessToken
+$headers = @{ Authorization = "Bearer $token" }
+
+# Создание карты
+$card = Invoke-RestMethod -Uri "http://localhost:8080/api/cards" -Method Post -ContentType "application/json" -Body '{"userId":"...","cardNumber":"4111111111111111","ownerName":"Test","expiryDate":"2030-01-01"}' -Headers $headers
+
+# Перевод
+$transfer = '{"fromCardId":"...","toCardId":"...","amount":10.00}'
+Invoke-RestMethod -Uri "http://localhost:8080/api/cards/transfer" -Method Post -ContentType "application/json" -Body $transfer -Headers $headers
+```
+
+> ⚠️ В PowerShell используйте одинарные кавычки для query string: `?page=0&size=10` → `'?page=0&size=10'`
+
+## 🐳 Docker (в разработке)
+
+Файл `docker-compose.yml` находится в стадии подготовки. Для локальной разработки используйте нативный PostgreSQL.
+
+## 🔒 Безопасность
+
+- Пароли хешируются через BCrypt
+- JWT подписывается HS256, срок жизни — 1 час
+- Все эндпоинты `/api/**` требуют аутентификации
+- Переводы возможны только между картами одного владельца
