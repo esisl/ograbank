@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank_db
+    username: bank_user
+    password: bank_pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none  # КРИТИЧНО: Liquibase управляет схемой, Hibernate только маппит
+    show-sql: false
+  liquibase:
+    enabled: true
+    change-log: classpath:db/migration/changelog-master.xml
+jwt:
+  secret: "devSecretKeyChangeMeInProduction123456789012345678901234567890"
+  expiration: 3600000  # 1 час
