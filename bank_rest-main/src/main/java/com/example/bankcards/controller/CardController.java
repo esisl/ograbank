@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageRequest;
+// import org.springframework.data.domain.Pageable;
+// import org.springframework.data.web.PageableDefault;
+// import org.springframework.data.domain.Sort;
+// import org.springframework.data.domain.PageRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 
 @RestController
@@ -56,6 +59,12 @@ public class CardController {
 
     @PostMapping("/transfer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(summary = "Перевод между картами", description = "Атомарный перевод средств между двумя картами одного владельца")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Перевод выполнен успешно"),
+        @ApiResponse(responseCode = "400", description = "Невалидный запрос / недостаточно средств"),
+        @ApiResponse(responseCode = "403", description = "Доступ запрещён (чужая карта)")
+    })
     @ResponseStatus(HttpStatus.OK)
     public void transferCards(@Valid @RequestBody TransferRequestDto dto) {
         cardService.transfer(dto);
