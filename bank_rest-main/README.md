@@ -135,10 +135,6 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/cards/transfer" -Method Post -
 
 > ⚠️ В PowerShell используйте одинарные кавычки для query string: `?page=0&size=10` → `'?page=0&size=10'`
 
-## 🐳 Docker (в разработке)
-
-Файл `docker-compose.yml` находится в стадии подготовки. Для локальной разработки используйте нативный PostgreSQL.
-
 ## 🔒 Безопасность
 
 - Пароли хешируются через BCrypt
